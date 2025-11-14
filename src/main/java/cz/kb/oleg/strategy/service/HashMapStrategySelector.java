@@ -6,6 +6,7 @@ import cz.kb.oleg.strategy.api.StrategySelector;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class HashMapStrategySelector<T, S extends Strategy<T>> implements StrategySelector<T, S> {
 
@@ -13,7 +14,9 @@ public class HashMapStrategySelector<T, S extends Strategy<T>> implements Strate
 
     @Override
     public List<S> selectStrategies(T t) {
-        return List.of(selectStrategy(t));
+        return selectStrategy(t)
+                .map(List::of)
+                .orElse(List.of());
     }
 
     public HashMapStrategySelector<T, S> withMapping(Class<T> clazz, S strategy) {
@@ -21,8 +24,8 @@ public class HashMapStrategySelector<T, S extends Strategy<T>> implements Strate
         return this;
     }
 
-    private S selectStrategy(T t) {
-        return strategyMap.get(t.getClass());
+    private Optional<S> selectStrategy(T t) {
+        return Optional.ofNullable(strategyMap.get(t.getClass()));
     }
 
 }

@@ -1,10 +1,10 @@
 package cz.kb.oleg.strategy;
 
 import cz.kb.oleg.strategy.api.StrategyHandler;
-import cz.kb.oleg.strategy.decisions.TestableStrategyHandler;
 import cz.kb.oleg.strategy.events.EventStrategy;
 import cz.kb.oleg.strategy.events.dto.EventDto;
 import cz.kb.oleg.strategy.events.dto.EventOneDto;
+import cz.kb.oleg.strategy.service.TestableStrategyHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

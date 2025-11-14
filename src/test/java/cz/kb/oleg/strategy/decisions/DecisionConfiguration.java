@@ -5,6 +5,7 @@ import cz.kb.oleg.strategy.api.StrategyExecutor;
 import cz.kb.oleg.strategy.api.StrategyHandler;
 import cz.kb.oleg.strategy.decisions.dto.DecisionDto;
 import cz.kb.oleg.strategy.service.AsyncStrategyExecutor;
+import cz.kb.oleg.strategy.service.TestableStrategyHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
