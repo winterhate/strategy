@@ -1,4 +1,10 @@
 package cz.kb.oleg.strategy.events.dto;
 
-public record EventDto(String name) {
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+@Getter
+public class EventDto {
+    private final String name;
 }

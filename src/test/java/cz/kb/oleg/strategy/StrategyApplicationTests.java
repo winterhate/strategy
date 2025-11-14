@@ -4,6 +4,7 @@ import cz.kb.oleg.strategy.api.StrategyHandler;
 import cz.kb.oleg.strategy.decisions.TestableStrategyHandler;
 import cz.kb.oleg.strategy.events.EventStrategy;
 import cz.kb.oleg.strategy.events.dto.EventDto;
+import cz.kb.oleg.strategy.events.dto.EventOneDto;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,9 @@ class StrategyApplicationTests {
 
     @Test
     void testStrategy() {
-        eventDtoStrategyHandler.handle(new EventDto("one"));
+        EventOneDto eventOneDto = new EventOneDto("one");
+        eventOneDto.setOne("1");
+        eventDtoStrategyHandler.handle(eventOneDto);
     }
 
 }

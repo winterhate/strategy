@@ -16,6 +16,7 @@ public class DecisionAllStrategy extends DecisionStrategy<DecisionDto> {
 
     @Override
     public void handle(DecisionDto dto) {
+        log.info("Decision ALL");
         throw new RuntimeException("Failure in DecisionAllStrategy");
     }
 

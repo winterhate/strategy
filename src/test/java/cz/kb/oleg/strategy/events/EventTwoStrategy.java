@@ -10,7 +10,7 @@ public class EventTwoStrategy extends EventStrategy<EventDto> {
 
     @Override
     public boolean canHandle(EventDto dto) {
-        return "two".equals(dto.name());
+        return "two".equals(dto.getName());
     }
 
     @Override
