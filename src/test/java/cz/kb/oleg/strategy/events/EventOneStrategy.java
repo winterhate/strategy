@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class EventOneStrategy extends EventStrategy<EventDto> {
 
-    private final StrategyDispatcher<DecisionDto> decisionStrategyDispatcher;
+    private final StrategyDispatcher<DecisionDto, Result.Void> decisionStrategyDispatcher;
 
     @Override
     public Class<EventOneDto> getApplicableClass() {
@@ -27,8 +27,19 @@ public class EventOneStrategy extends EventStrategy<EventDto> {
             throw new IllegalArgumentException("Invalid dto type: " + dto.getClass());
         }
         log.info("Handled by EventOneStrategy: {}", eventOneDto);
-        decisionStrategyDispatcher.dispatch(new DecisionDto("one"));
-        decisionStrategyDispatcher.dispatch(new DecisionDto("two"));
+        decisionStrategyDispatcher.dispatch(new DecisionDto("one")).forEach(result -> {
+            log.info("Decision one result: {}", result);
+            if (result.isFuture()) {
+                log.info("1/ Resolved as {}", result.resolve());
+            }
+        });
+
+        decisionStrategyDispatcher.dispatch(new DecisionDto("two")).forEach(result -> {
+            log.info("Decision two result: {}", result);
+            if (result.isFuture()) {
+                log.info("2/ Resolved as {}", result.resolve());
+            }
+        });
         return Result.Ok();
     }
 

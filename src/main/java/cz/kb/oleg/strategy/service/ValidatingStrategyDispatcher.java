@@ -1,5 +1,6 @@
 package cz.kb.oleg.strategy.service;
 
+import cz.kb.oleg.strategy.api.Result;
 import cz.kb.oleg.strategy.api.Strategy;
 import cz.kb.oleg.strategy.api.StrategyExecutor;
 import cz.kb.oleg.strategy.api.StrategySelector;
@@ -7,6 +8,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
@@ -27,13 +29,13 @@ public class ValidatingStrategyDispatcher<T, R, S extends Strategy<T, R>> extend
     }
 
     @Override
-    public void dispatch(T data) {
+    public List<Result<R>> dispatch(T data) {
         var violations = validator.validate(data);
         if (!violations.isEmpty()) {
             onValidationViolation(violations);
-            return;
+            return List.of();
         }
-        super.dispatch(data);
+        return super.dispatch(data);
     }
 
     protected void onValidationViolation(Set<ConstraintViolation<T>> violations) {

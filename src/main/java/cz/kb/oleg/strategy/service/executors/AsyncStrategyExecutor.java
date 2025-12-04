@@ -1,5 +1,6 @@
 package cz.kb.oleg.strategy.service.executors;
 
+import cz.kb.oleg.strategy.api.Result;
 import cz.kb.oleg.strategy.api.Strategy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
@@ -23,8 +24,9 @@ public class AsyncStrategyExecutor<T, R> extends DefaultStrategyExecutor<T, R> i
     }
 
     @Override
-    public void executeStrategy(Strategy<T, R> strategy, T t) {
-        executor.execute(() -> super.executeStrategy(strategy, t));
+    public Result<R> executeStrategy(Strategy<T, R> strategy, T t) {
+        final var resultFuture = executor.submit(() -> super.executeStrategy(strategy, t));
+        return Result.Future(resultFuture);
     }
 
     @Override
@@ -36,6 +38,6 @@ public class AsyncStrategyExecutor<T, R> extends DefaultStrategyExecutor<T, R> i
             log.warn("AsyncStrategyHandler executor did not shut down in the allocated time. Forcing shutdown.");
             executor.shutdownNow();
         }
-        ;
     }
+
 }

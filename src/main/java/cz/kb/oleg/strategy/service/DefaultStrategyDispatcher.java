@@ -1,5 +1,6 @@
 package cz.kb.oleg.strategy.service;
 
+import cz.kb.oleg.strategy.api.Result;
 import cz.kb.oleg.strategy.api.Strategy;
 import cz.kb.oleg.strategy.api.StrategyDispatcher;
 import cz.kb.oleg.strategy.api.StrategyExecutor;
@@ -7,8 +8,10 @@ import cz.kb.oleg.strategy.api.StrategySelector;
 import cz.kb.oleg.strategy.service.executors.DefaultStrategyExecutor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+
 @Slf4j
-public class DefaultStrategyDispatcher<T, R, S extends Strategy<T, R>> implements StrategyDispatcher<T> {
+public class DefaultStrategyDispatcher<T, R, S extends Strategy<T, R>> implements StrategyDispatcher<T, R> {
 
     private final StrategySelector<T, S> strategySelector;
     private final StrategyExecutor<T, R> strategyExecutor;
@@ -23,9 +26,10 @@ public class DefaultStrategyDispatcher<T, R, S extends Strategy<T, R>> implement
     }
 
     @Override
-    public void dispatch(T data) {
-        strategySelector.selectStrategies(data)
-                .forEach(strategy -> strategyExecutor.executeStrategy(strategy, data));
+    public List<Result<R>> dispatch(T data) {
+        return strategySelector.selectStrategies(data).stream()
+                .map(strategy -> strategyExecutor.executeStrategy(strategy, data))
+                .toList();
     }
 
 }

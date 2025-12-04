@@ -29,7 +29,7 @@ public class DecisionConfiguration {
     }
 
     @Bean
-    public StrategyDispatcher<DecisionDto> decisionStrategyHandler(
+    public StrategyDispatcher<DecisionDto, Result.Void> decisionStrategyHandler(
             StrategySelector<DecisionDto, DecisionStrategy<DecisionDto>> decisionStrategySelector,
             StrategyExecutor<DecisionDto, Result.Void> decisionStrategyExecutor) {
         return new DefaultStrategyDispatcher<>(decisionStrategySelector, decisionStrategyExecutor);

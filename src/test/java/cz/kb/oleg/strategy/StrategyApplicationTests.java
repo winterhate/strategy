@@ -9,7 +9,7 @@ import cz.kb.oleg.strategy.events.dto.EventDto;
 import cz.kb.oleg.strategy.events.dto.EventOneDto;
 import cz.kb.oleg.strategy.events.dto.EventTwoDto;
 import cz.kb.oleg.strategy.service.ValidatingStrategyDispatcher;
-import cz.kb.oleg.strategy.service.executors.DefaultStrategyExecutor;
+import cz.kb.oleg.strategy.service.executors.AsyncStrategyExecutor;
 import cz.kb.oleg.strategy.service.selectors.CachedStrategySelector;
 import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
@@ -40,11 +40,11 @@ class StrategyApplicationTests {
 
         @Bean
         public StrategyExecutor<EventDto, Result.Void> eventDtoStrategyExecutor() {
-            return new DefaultStrategyExecutor<>();
+            return new AsyncStrategyExecutor<>();
         }
 
         @Bean
-        public StrategyDispatcher<EventDto> eventDtoStrategyHandler(
+        public StrategyDispatcher<EventDto, Result.Void> eventDtoStrategyHandler(
                 StrategySelector<EventDto, EventStrategy<EventDto>> eventDtoStrategySelector,
                 StrategyExecutor<EventDto, Result.Void> eventDtoStrategyExecutor,
                 Validator validator) {
@@ -62,7 +62,7 @@ class StrategyApplicationTests {
     }
 
     @Autowired
-    StrategyDispatcher<EventDto> eventDtoStrategyDispatcher;
+    StrategyDispatcher<EventDto, Result.Void> eventDtoStrategyDispatcher;
 
     @Test
     void testStrategy() {

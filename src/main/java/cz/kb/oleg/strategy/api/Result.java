@@ -3,6 +3,7 @@ package cz.kb.oleg.strategy.api;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -30,20 +31,29 @@ import java.util.function.Function;
 @SuppressWarnings("unused")
 public sealed interface Result<T> {
     /**
-     * Returns true if the result is {@link Ok}, otherwise false if it is an
-     * {@link Err}.
+     * Returns true if the result is {@link Ok}, otherwise false
      *
      * @return true if the result is {@link Ok}, otherwise false.
      */
     boolean isOk();
 
     /**
-     * Returns true if the result is {@link Err}, otherwise false if it is an
-     * {@link Ok}.
+     * Returns true if the result is {@link Err}, otherwise false
      *
      * @return true if the result is {@link Err}, otherwise false.
      */
     boolean isErr();
+
+    /**
+     * Returns true if the result is {@link Future}, otherwise false
+     *
+     * @return true if the result is {@link Err}, otherwise false.
+     */
+    boolean isFuture();
+
+    default Result<T> resolve() {
+        return this;
+    }
 
     /**
      * Returns the contained {@link Ok} value.
@@ -183,6 +193,16 @@ public sealed interface Result<T> {
     }
 
     /**
+     * Returns an {@link Ok} with the specified value.
+     *
+     * @param value the value to be present in the {@link Ok}
+     * @return an {@link Ok} with the specified value, {@link Err} if the value is null
+     */
+    static <T> Result<T> Future(java.util.concurrent.Future<Result<T>> value) {
+        return new Future<>(value);
+    }
+
+    /**
      * Represents an empty result, i.e. a result that contains no value.
      */
     record Void() {
@@ -212,6 +232,11 @@ public sealed interface Result<T> {
         @Override
         public boolean isErr() {
             return true;
+        }
+
+        @Override
+        public boolean isFuture() {
+            return false;
         }
 
         @Override
@@ -344,6 +369,11 @@ public sealed interface Result<T> {
         }
 
         @Override
+        public boolean isFuture() {
+            return false;
+        }
+
+        @Override
         public T get() {
             return value;
         }
@@ -443,6 +473,161 @@ public sealed interface Result<T> {
         @Override
         public String toString() {
             return "Ok[" + value + "]";
+        }
+    }
+
+    final class Future<T> implements Result<T> {
+
+        private final java.util.concurrent.Future<Result<T>> value;
+        private Result<T> resolvedValue = null;
+
+        Future(java.util.concurrent.Future<Result<T>> value) {
+            this.value = value;
+        }
+
+        @Override
+        public boolean isOk() {
+            return true;
+        }
+
+        @Override
+        public boolean isErr() {
+            return false;
+        }
+
+        @Override
+        public boolean isFuture() {
+            return true;
+        }
+
+        @Override
+        public Result<T> resolve() {
+            if (resolvedValue != null) {
+                return resolvedValue;
+            }
+            try {
+                final var result = value.get();
+                resolvedValue = result;
+                return result;
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return Err(new NoSuchElementException("No value present: " + e.getMessage()));
+            } catch (ExecutionException e) {
+                return Err(e);
+            }
+        }
+
+        @Override
+        public T get() {
+            resolve();
+            return resolvedValue.get();
+        }
+
+        @Override
+        public T getOr(T other) {
+            return get();
+        }
+
+        @Override
+        public T getOr(Function<Throwable, T> function) {
+            return get();
+        }
+
+        @Override
+        public Throwable error() {
+            throw new NoSuchElementException("No error present");
+        }
+
+        @Override
+        public String getErrorMessage() {
+            throw new NoSuchElementException("No error present");
+        }
+
+        @Override
+        public void printErrorMessage() {
+            throw new NoSuchElementException("No error present");
+        }
+
+        @Override
+        public Result<T> onOk(Consumer<T> okConsumer) {
+            okConsumer.accept(get());
+            return this;
+        }
+
+        @Override
+        public Result<T> on(Consumer<T> okConsumer, Consumer<Throwable> errConsumer) {
+            okConsumer.accept(get());
+            return this;
+        }
+
+        @Override
+        public Result<T> onErr(Consumer<Throwable> errConsumer) {
+            return this;
+        }
+
+        @Override
+        public <R> Result<R> map(Function<T, Result<R>> okMapper) {
+            return Objects.requireNonNull(okMapper.apply(get()));
+        }
+
+        @Override
+        public <R> R mapOr(Function<T, R> okMapper, Function<Throwable, R> errMapper) {
+            return Objects.requireNonNull(okMapper.apply(get()));
+        }
+
+        /**
+         * Indicates whether some other object is "equal to" this {@code Ok}.
+         * The other object is considered equal if:
+         * <ul>
+         * <li>it is also an {@code Ok} and;
+         * <li>both instances have no value present or;
+         * <li>the present values are "equal to" each other via {@code equals()}.
+         * </ul>
+         *
+         * @param obj an object to be tested for equality
+         * @return {@code true} if the other object is "equal to" this object
+         * otherwise {@code false}
+         */
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+
+            if (obj instanceof Future<?> other) {
+                try {
+                    return Objects.equals(this.value.get(), other.value.get());
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return false;
+                } catch (ExecutionException e) {
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        /**
+         * Returns the hash code of the value, if present, otherwise {@code 0}
+         * (zero) if no value is present.
+         *
+         * @return hash code value of the present value or {@code 0} if no value is
+         * present
+         */
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(value);
+        }
+
+        /**
+         * Returns a string representation of this {@code Ok}
+         * suitable for debugging.
+         *
+         * @return the string representation of this instance
+         */
+        @Override
+        public String toString() {
+            return "Future[" + value + "]";
         }
     }
 }

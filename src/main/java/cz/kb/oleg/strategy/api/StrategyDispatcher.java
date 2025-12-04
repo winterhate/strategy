@@ -1,7 +1,9 @@
 package cz.kb.oleg.strategy.api;
 
-public interface StrategyDispatcher<T> {
+import java.util.List;
 
-    void dispatch(T data);
+public interface StrategyDispatcher<T, R> {
+
+    List<Result<R>> dispatch(T data);
 
 }
