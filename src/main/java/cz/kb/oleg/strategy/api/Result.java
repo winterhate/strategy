@@ -593,16 +593,8 @@ public sealed interface Result<T> {
             if (this == obj) {
                 return true;
             }
-
             if (obj instanceof Future<?> other) {
-                try {
-                    return Objects.equals(this.value.get(), other.value.get());
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    return false;
-                } catch (ExecutionException e) {
-                    return false;
-                }
+                return Objects.equals(this.value, other.value);
             }
             return false;
         }
