@@ -6,6 +6,7 @@ import cz.kb.oleg.strategy.decisions.dto.DecisionDto;
 import cz.kb.oleg.strategy.events.dto.EventDto;
 import cz.kb.oleg.strategy.events.dto.EventOneDto;
 import cz.kb.oleg.strategy.service.result.NoValue;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ public class EventOneStrategy extends EventStrategy<EventDto> {
     private final StrategyDispatcher<DecisionDto, NoValue> decisionStrategyDispatcher;
 
     @Override
+    @NonNull
     public Class<EventOneDto> getApplicableClass() {
         return EventOneDto.class;
     }
@@ -41,6 +43,7 @@ public class EventOneStrategy extends EventStrategy<EventDto> {
                 log.info("2/ Resolved as {}", result.resolve());
             }
         });
+
         return Result.Ok();
     }
 

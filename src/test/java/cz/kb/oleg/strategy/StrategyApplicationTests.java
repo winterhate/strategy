@@ -72,14 +72,11 @@ class StrategyApplicationTests {
     @Test
     void testStrategy() {
         eventDtoStrategyDispatcher.dispatch(new EventOneDto()).forEach(result -> {
-            ;
             log.info("Result one: {}", result);
         });
         final var data = new EventTwoDto();
-
         data.setDetailTwo(null); // to test validation
         eventDtoStrategyDispatcher.dispatch(data).forEach(result -> {
-            ;
             log.info("Result two: {}", result);
         });
     }

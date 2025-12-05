@@ -4,6 +4,7 @@ import cz.kb.oleg.strategy.api.Result;
 import cz.kb.oleg.strategy.events.dto.EventDto;
 import cz.kb.oleg.strategy.events.dto.EventTwoDto;
 import cz.kb.oleg.strategy.service.result.NoValue;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 public class EventTwoStrategy extends EventStrategy<EventDto> {
 
     @Override
+    @NonNull
     public Class<EventTwoDto> getApplicableClass() {
         return EventTwoDto.class;
     }

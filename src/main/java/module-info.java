@@ -7,6 +7,7 @@ module strategy {
     requires spring.boot.autoconfigure;
     requires spring.context;
     requires org.slf4j;
+    requires spring.core;
 
     exports cz.kb.oleg.strategy.api;
     exports cz.kb.oleg.strategy.service.dispatcher;
