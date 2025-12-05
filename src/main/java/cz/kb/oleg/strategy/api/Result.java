@@ -1,5 +1,7 @@
 package cz.kb.oleg.strategy.api;
 
+import cz.kb.oleg.strategy.service.AtomicFieldCache;
+
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
@@ -178,7 +180,7 @@ public sealed interface Result<T> {
      * @return an {@link Ok} with a value of {@code true}
      */
     static Result<Void> Ok() {
-        return new Ok<>(new Void());
+        return new Ok<>(Void.getInstance());
     }
 
     /**
@@ -205,7 +207,15 @@ public sealed interface Result<T> {
     /**
      * Represents an empty result, i.e. a result that contains no value.
      */
-    record Void() {
+    class Void {
+        private static final Void INSTANCE = new Void();
+
+        private Void() {
+        }
+
+        static Void getInstance() {
+            return INSTANCE;
+        }
     }
 
     /**
@@ -479,7 +489,7 @@ public sealed interface Result<T> {
     final class Future<T> implements Result<T> {
 
         private final java.util.concurrent.Future<Result<T>> value;
-        private Result<T> resolvedValue = null;
+        private final AtomicFieldCache<Result<T>> resolvedCache = new AtomicFieldCache<>();
 
         Future(java.util.concurrent.Future<Result<T>> value) {
             this.value = value;
@@ -502,25 +512,29 @@ public sealed interface Result<T> {
 
         @Override
         public Result<T> resolve() {
-            if (resolvedValue != null) {
-                return resolvedValue;
+            return resolvedCache.getOrLoad(this::fullyResolveResult);
+        }
+
+        private Result<T> fullyResolveResult() {
+            Result<T> result = this;
+            while (result.isFuture()) {
+                try {
+                    result = value.get();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    result = Err(e);
+                    break;
+                } catch (ExecutionException e) {
+                    result = Err(e);
+                    break;
+                }
             }
-            try {
-                final var result = value.get();
-                resolvedValue = result;
-                return result;
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return Err(new NoSuchElementException("No value present: " + e.getMessage()));
-            } catch (ExecutionException e) {
-                return Err(e);
-            }
+            return result;
         }
 
         @Override
         public T get() {
-            resolve();
-            return resolvedValue.get();
+            return resolve().get();
         }
 
         @Override
@@ -622,4 +636,5 @@ public sealed interface Result<T> {
             return "Future[" + value + "]";
         }
     }
+
 }
