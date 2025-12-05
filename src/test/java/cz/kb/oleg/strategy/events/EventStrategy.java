@@ -1,8 +1,8 @@
 package cz.kb.oleg.strategy.events;
 
-import cz.kb.oleg.strategy.api.Result;
 import cz.kb.oleg.strategy.events.dto.EventDto;
-import cz.kb.oleg.strategy.service.strategies.AbstractClassMappedStrategy;
+import cz.kb.oleg.strategy.service.result.NoValue;
+import cz.kb.oleg.strategy.service.strategies.ClassMappedStrategy;
 
-public abstract class EventStrategy<T extends EventDto> extends AbstractClassMappedStrategy<T, Result.Void> {
+public abstract class EventStrategy<T extends EventDto> implements ClassMappedStrategy<T, NoValue> {
 }

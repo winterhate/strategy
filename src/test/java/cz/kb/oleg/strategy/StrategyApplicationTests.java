@@ -1,6 +1,5 @@
 package cz.kb.oleg.strategy;
 
-import cz.kb.oleg.strategy.api.Result;
 import cz.kb.oleg.strategy.api.StrategyDispatcher;
 import cz.kb.oleg.strategy.api.StrategyExecutor;
 import cz.kb.oleg.strategy.api.StrategySelector;
@@ -8,8 +7,11 @@ import cz.kb.oleg.strategy.events.EventStrategy;
 import cz.kb.oleg.strategy.events.dto.EventDto;
 import cz.kb.oleg.strategy.events.dto.EventOneDto;
 import cz.kb.oleg.strategy.events.dto.EventTwoDto;
-import cz.kb.oleg.strategy.service.ValidatingStrategyDispatcher;
+import cz.kb.oleg.strategy.service.dispatcher.DefaultStrategyDispatcher;
+import cz.kb.oleg.strategy.service.dispatcher.ValidatingStrategyDispatcher;
 import cz.kb.oleg.strategy.service.executors.AsyncStrategyExecutor;
+import cz.kb.oleg.strategy.service.executors.DefaultStrategyExecutor;
+import cz.kb.oleg.strategy.service.result.NoValue;
 import cz.kb.oleg.strategy.service.selectors.CachedStrategySelector;
 import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
@@ -39,16 +41,19 @@ class StrategyApplicationTests {
         }
 
         @Bean
-        public StrategyExecutor<EventDto, Result.Void> eventDtoStrategyExecutor() {
-            return new AsyncStrategyExecutor<>();
+        public StrategyExecutor<EventDto, NoValue> eventDtoStrategyExecutor() {
+            return new AsyncStrategyExecutor<>(new DefaultStrategyExecutor<>());
         }
 
         @Bean
-        public StrategyDispatcher<EventDto, Result.Void> eventDtoStrategyHandler(
+        public StrategyDispatcher<EventDto, NoValue> eventDtoStrategyHandler(
                 StrategySelector<EventDto, EventStrategy<EventDto>> eventDtoStrategySelector,
-                StrategyExecutor<EventDto, Result.Void> eventDtoStrategyExecutor,
+                StrategyExecutor<EventDto, NoValue> eventDtoStrategyExecutor,
                 Validator validator) {
-            return new ValidatingStrategyDispatcher<>(eventDtoStrategySelector, eventDtoStrategyExecutor, validator);
+            return new ValidatingStrategyDispatcher<>(
+                    new DefaultStrategyDispatcher<>(eventDtoStrategySelector, eventDtoStrategyExecutor),
+                    validator
+            );
         }
 
         @Bean
@@ -62,15 +67,21 @@ class StrategyApplicationTests {
     }
 
     @Autowired
-    StrategyDispatcher<EventDto, Result.Void> eventDtoStrategyDispatcher;
+    StrategyDispatcher<EventDto, NoValue> eventDtoStrategyDispatcher;
 
     @Test
     void testStrategy() {
-        eventDtoStrategyDispatcher.dispatch(new EventOneDto());
+        eventDtoStrategyDispatcher.dispatch(new EventOneDto()).forEach(result -> {
+            ;
+            log.info("Result one: {}", result);
+        });
         final var data = new EventTwoDto();
 
         data.setDetailTwo(null); // to test validation
-        eventDtoStrategyDispatcher.dispatch(data);
+        eventDtoStrategyDispatcher.dispatch(data).forEach(result -> {
+            ;
+            log.info("Result two: {}", result);
+        });
     }
 
 }

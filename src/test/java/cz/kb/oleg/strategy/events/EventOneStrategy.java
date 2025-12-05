@@ -5,6 +5,7 @@ import cz.kb.oleg.strategy.api.StrategyDispatcher;
 import cz.kb.oleg.strategy.decisions.dto.DecisionDto;
 import cz.kb.oleg.strategy.events.dto.EventDto;
 import cz.kb.oleg.strategy.events.dto.EventOneDto;
+import cz.kb.oleg.strategy.service.result.NoValue;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class EventOneStrategy extends EventStrategy<EventDto> {
 
-    private final StrategyDispatcher<DecisionDto, Result.Void> decisionStrategyDispatcher;
+    private final StrategyDispatcher<DecisionDto, NoValue> decisionStrategyDispatcher;
 
     @Override
     public Class<EventOneDto> getApplicableClass() {
@@ -22,7 +23,7 @@ public class EventOneStrategy extends EventStrategy<EventDto> {
     }
 
     @Override
-    public Result<Result.Void> apply(EventDto dto) {
+    public Result<NoValue> apply(EventDto dto) {
         if (!(dto instanceof EventOneDto eventOneDto)) {
             throw new IllegalArgumentException("Invalid dto type: " + dto.getClass());
         }

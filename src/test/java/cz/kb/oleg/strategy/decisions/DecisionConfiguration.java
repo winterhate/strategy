@@ -1,13 +1,16 @@
 package cz.kb.oleg.strategy.decisions;
 
-import cz.kb.oleg.strategy.api.Result;
 import cz.kb.oleg.strategy.api.StrategyDispatcher;
 import cz.kb.oleg.strategy.api.StrategyExecutor;
 import cz.kb.oleg.strategy.api.StrategySelector;
 import cz.kb.oleg.strategy.decisions.dto.DecisionDto;
-import cz.kb.oleg.strategy.service.DefaultStrategyDispatcher;
+import cz.kb.oleg.strategy.service.dispatcher.DefaultStrategyDispatcher;
+import cz.kb.oleg.strategy.service.dispatcher.ValidatingStrategyDispatcher;
 import cz.kb.oleg.strategy.service.executors.AsyncStrategyExecutor;
+import cz.kb.oleg.strategy.service.executors.DefaultStrategyExecutor;
+import cz.kb.oleg.strategy.service.result.NoValue;
 import cz.kb.oleg.strategy.service.selectors.TestableStrategySelector;
+import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,15 +27,16 @@ public class DecisionConfiguration {
     }
 
     @Bean
-    public StrategyExecutor<DecisionDto, Result.Void> decisionStrategyExecutor() {
-        return new AsyncStrategyExecutor<>();
+    public StrategyExecutor<DecisionDto, NoValue> decisionStrategyExecutor() {
+        return new AsyncStrategyExecutor<>(new DefaultStrategyExecutor<>());
     }
 
     @Bean
-    public StrategyDispatcher<DecisionDto, Result.Void> decisionStrategyHandler(
+    public StrategyDispatcher<DecisionDto, NoValue> decisionStrategyHandler(
             StrategySelector<DecisionDto, DecisionStrategy<DecisionDto>> decisionStrategySelector,
-            StrategyExecutor<DecisionDto, Result.Void> decisionStrategyExecutor) {
-        return new DefaultStrategyDispatcher<>(decisionStrategySelector, decisionStrategyExecutor);
+            StrategyExecutor<DecisionDto, NoValue> decisionStrategyExecutor,
+            Validator validator) {
+        return new ValidatingStrategyDispatcher<>(new DefaultStrategyDispatcher<>(decisionStrategySelector, decisionStrategyExecutor), validator);
     }
 
 }

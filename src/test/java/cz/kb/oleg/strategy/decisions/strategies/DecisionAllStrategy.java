@@ -3,6 +3,7 @@ package cz.kb.oleg.strategy.decisions.strategies;
 import cz.kb.oleg.strategy.api.Result;
 import cz.kb.oleg.strategy.decisions.DecisionStrategy;
 import cz.kb.oleg.strategy.decisions.dto.DecisionDto;
+import cz.kb.oleg.strategy.service.result.NoValue;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +17,7 @@ public class DecisionAllStrategy extends DecisionStrategy<DecisionDto> {
     }
 
     @Override
-    public Result<Result.Void> apply(DecisionDto dto) {
+    public Result<NoValue> apply(DecisionDto dto) {
         return Result.Err(new RuntimeException("Failure in DecisionAllStrategy"));
     }
 

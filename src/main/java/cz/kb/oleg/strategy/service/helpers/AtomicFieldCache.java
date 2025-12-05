@@ -1,4 +1,4 @@
-package cz.kb.oleg.strategy.service;
+package cz.kb.oleg.strategy.service.helpers;
 
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;

@@ -1,7 +1,7 @@
 package cz.kb.oleg.strategy.service.selectors;
 
 import cz.kb.oleg.strategy.api.StrategySelector;
-import cz.kb.oleg.strategy.api.TestableStrategy;
+import cz.kb.oleg.strategy.service.strategies.TestableStrategy;
 
 import java.util.Collection;
 import java.util.Comparator;
