@@ -14,6 +14,5 @@ module strategy {
     exports cz.kb.oleg.strategy.service.executors;
     exports cz.kb.oleg.strategy.service.selectors;
     exports cz.kb.oleg.strategy.service.strategies;
-    exports cz.kb.oleg.strategy.service.result;
 
 }

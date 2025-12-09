@@ -1,7 +1,7 @@
 package cz.kb.oleg.strategy.api;
 
-public interface Strategy<T, R> {
+public interface Strategy<T> {
 
-    Result<R> apply(T t);
+    void apply(T t);
 
 }

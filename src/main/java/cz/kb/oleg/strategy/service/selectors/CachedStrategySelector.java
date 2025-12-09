@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CachedStrategySelector<T, R, S extends ClassMappedStrategy<T, R>> implements StrategySelector<T, S> {
+public class CachedStrategySelector<T, S extends ClassMappedStrategy<T>> implements StrategySelector<T, S> {
 
     private final Map<Class<?>, List<S>> strategyMap = new HashMap<>();
 

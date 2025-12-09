@@ -9,10 +9,9 @@ import cz.kb.oleg.strategy.events.dto.EventOneDto;
 import cz.kb.oleg.strategy.events.dto.EventTwoDto;
 import cz.kb.oleg.strategy.service.dispatcher.DefaultStrategyDispatcher;
 import cz.kb.oleg.strategy.service.dispatcher.ValidatingStrategyDispatcher;
-import cz.kb.oleg.strategy.service.executors.AsyncStrategyExecutor;
 import cz.kb.oleg.strategy.service.executors.DefaultStrategyExecutor;
-import cz.kb.oleg.strategy.service.result.NoValue;
 import cz.kb.oleg.strategy.service.selectors.CachedStrategySelector;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -26,6 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 import static jakarta.validation.Validation.buildDefaultValidatorFactory;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Slf4j
@@ -41,14 +41,15 @@ class StrategyApplicationTests {
         }
 
         @Bean
-        public StrategyExecutor<EventDto, NoValue> eventDtoStrategyExecutor() {
-            return new AsyncStrategyExecutor<>(new DefaultStrategyExecutor<>());
+        public StrategyExecutor<EventDto> eventDtoStrategyExecutor() {
+            return new DefaultStrategyExecutor<>();
+//            return new AsyncStrategyExecutor<>(new DefaultStrategyExecutor<>());
         }
 
         @Bean
-        public StrategyDispatcher<EventDto, NoValue> eventDtoStrategyHandler(
+        public StrategyDispatcher<EventDto> eventDtoStrategyHandler(
                 StrategySelector<EventDto, EventStrategy<EventDto>> eventDtoStrategySelector,
-                StrategyExecutor<EventDto, NoValue> eventDtoStrategyExecutor,
+                StrategyExecutor<EventDto> eventDtoStrategyExecutor,
                 Validator validator) {
             return new ValidatingStrategyDispatcher<>(
                     new DefaultStrategyDispatcher<>(eventDtoStrategySelector, eventDtoStrategyExecutor),
@@ -67,18 +68,14 @@ class StrategyApplicationTests {
     }
 
     @Autowired
-    StrategyDispatcher<EventDto, NoValue> eventDtoStrategyDispatcher;
+    StrategyDispatcher<EventDto> eventDtoStrategyDispatcher;
 
     @Test
     void testStrategy() {
-        eventDtoStrategyDispatcher.dispatch(new EventOneDto()).forEach(result -> {
-            log.info("Result one: {}", result);
-        });
+        eventDtoStrategyDispatcher.dispatch(new EventOneDto());
         final var data = new EventTwoDto();
         data.setDetailTwo(null); // to test validation
-        eventDtoStrategyDispatcher.dispatch(data).forEach(result -> {
-            log.info("Result two: {}", result);
-        });
+        assertThrows(ConstraintViolationException.class, () -> eventDtoStrategyDispatcher.dispatch(data));
     }
 
 }

@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
-public class DefaultStrategySelector<T, R, S extends Strategy<T, R>> implements StrategySelector<T, S> {
+public class DefaultStrategySelector<T, S extends Strategy<T>> implements StrategySelector<T, S> {
 
     private final List<S> testableStrategies;
 
