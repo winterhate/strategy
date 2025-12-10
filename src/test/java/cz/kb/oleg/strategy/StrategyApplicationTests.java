@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 import static jakarta.validation.Validation.buildDefaultValidatorFactory;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
@@ -74,8 +75,9 @@ class StrategyApplicationTests {
     void testStrategy() {
         eventDtoStrategyDispatcher.dispatch(new EventOneDto());
         final var data = new EventTwoDto();
-        data.setDetailTwo(null); // to test validation
-        assertThrows(ConstraintViolationException.class, () -> eventDtoStrategyDispatcher.dispatch(data));
+        data.setDetailTwo(""); // to test validation
+        final var constraintViolationException = assertThrows(ConstraintViolationException.class, () -> eventDtoStrategyDispatcher.dispatch(data));
+        assertEquals("detailTwo: must not be blank", constraintViolationException.getMessage());
     }
 
 }

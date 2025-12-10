@@ -1,5 +1,6 @@
 package cz.kb.oleg.strategy.decisions;
 
+import cz.kb.oleg.strategy.api.Strategy;
 import cz.kb.oleg.strategy.api.StrategyDispatcher;
 import cz.kb.oleg.strategy.api.StrategyExceptionHandler;
 import cz.kb.oleg.strategy.api.StrategyExecutor;
@@ -8,6 +9,7 @@ import cz.kb.oleg.strategy.decisions.dto.DecisionDto;
 import cz.kb.oleg.strategy.service.dispatcher.DefaultStrategyDispatcher;
 import cz.kb.oleg.strategy.service.dispatcher.ValidatingStrategyDispatcher;
 import cz.kb.oleg.strategy.service.executors.AsyncStrategyExecutor;
+import cz.kb.oleg.strategy.service.executors.DefaultStrategyExceptionHandler;
 import cz.kb.oleg.strategy.service.executors.DefaultStrategyExecutor;
 import cz.kb.oleg.strategy.service.selectors.TestableStrategySelector;
 import jakarta.validation.Validator;
@@ -28,9 +30,13 @@ public class DecisionConfiguration {
 
     @Bean
     public StrategyExceptionHandler<DecisionDto> decisionStrategyExecutorExceptionHandler() {
-        return (strategy, decisionDto, exception)
-                -> log.info("Error executing strategy {} for input {}: {}", strategy.getClass().getSimpleName(),
-                decisionDto, exception.getMessage());
+        return new DefaultStrategyExceptionHandler<>() {
+            @Override
+            public void handleException(Strategy<DecisionDto> strategy, DecisionDto decisionDto, Exception e) {
+                final var strategyName = getStrategyName(strategy);
+                log.warn("Strategy {} execution failed with error: {}", strategyName, e.getMessage());
+            }
+        };
     }
 
     @Bean

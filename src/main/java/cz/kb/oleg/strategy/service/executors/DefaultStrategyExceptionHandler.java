@@ -9,8 +9,12 @@ public class DefaultStrategyExceptionHandler<T> implements StrategyExceptionHand
 
     @Override
     public void handleException(Strategy<T> strategy, T data, Exception e) {
-        final var strategyName = strategy.getClass().getSimpleName();
+        final var strategyName = getStrategyName(strategy);
         log.error("Strategy {} execution failed with error: {}", strategyName, e.getMessage(), e);
+    }
+
+    protected String getStrategyName(Strategy<T> strategy) {
+        return strategy.getClass().getSimpleName();
     }
 
 }
