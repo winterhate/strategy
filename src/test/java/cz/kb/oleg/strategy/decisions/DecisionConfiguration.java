@@ -1,16 +1,13 @@
 package cz.kb.oleg.strategy.decisions;
 
-import cz.kb.oleg.strategy.api.Strategy;
-import cz.kb.oleg.strategy.api.StrategyDispatcher;
-import cz.kb.oleg.strategy.api.StrategyExceptionHandler;
-import cz.kb.oleg.strategy.api.StrategyExecutor;
-import cz.kb.oleg.strategy.api.StrategySelector;
+import cz.kb.oleg.strategy.api.*;
 import cz.kb.oleg.strategy.decisions.dto.DecisionDto;
 import cz.kb.oleg.strategy.service.dispatcher.DefaultStrategyDispatcher;
 import cz.kb.oleg.strategy.service.dispatcher.ValidatingStrategyDispatcher;
 import cz.kb.oleg.strategy.service.executors.AsyncStrategyExecutor;
 import cz.kb.oleg.strategy.service.executors.DefaultStrategyExceptionHandler;
 import cz.kb.oleg.strategy.service.executors.DefaultStrategyExecutor;
+import cz.kb.oleg.strategy.service.executors.LoggingStrategyExecutor;
 import cz.kb.oleg.strategy.service.selectors.TestableStrategySelector;
 import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +38,7 @@ public class DecisionConfiguration {
 
     @Bean
     public StrategyExecutor<DecisionDto> decisionStrategyExecutor(StrategyExceptionHandler<DecisionDto> decisionStrategyExceptionHandler) {
-        return new AsyncStrategyExecutor<>(new DefaultStrategyExecutor<>(decisionStrategyExceptionHandler));
+        return new AsyncStrategyExecutor<>(new LoggingStrategyExecutor<>(new DefaultStrategyExecutor<>(decisionStrategyExceptionHandler)));
     }
 
     @Bean
