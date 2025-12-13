@@ -23,6 +23,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
+import java.util.Locale;
 
 import static jakarta.validation.Validation.buildDefaultValidatorFactory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,6 +32,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @Slf4j
 class StrategyApplicationTests {
+
+    static {
+        Locale.setDefault(Locale.US);
+    }
 
     @Configuration
     @ComponentScan("cz.kb.oleg.strategy")
