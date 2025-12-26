@@ -1,35 +1,32 @@
 package cz.kb.oleg.strategy.service.executors;
 
 import cz.kb.oleg.strategy.api.Strategy;
-import cz.kb.oleg.strategy.api.StrategyExceptionHandler;
 import cz.kb.oleg.strategy.api.StrategyExecutor;
+import cz.kb.oleg.strategy.api.StrategyResultHandler;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class DefaultStrategyExecutor<T> implements StrategyExecutor<T> {
 
-    private final StrategyExceptionHandler<T> strategyExceptionHandler;
+    private final StrategyResultHandler<T> strategyResultHandler;
 
     public DefaultStrategyExecutor() {
-        this(new DefaultStrategyExceptionHandler<>());
+        this(new DefaultStrategyResultHandler<>());
     }
 
-    public DefaultStrategyExecutor(StrategyExceptionHandler<T> strategyExceptionHandler) {
-        this.strategyExceptionHandler = strategyExceptionHandler;
+    public DefaultStrategyExecutor(@NonNull StrategyResultHandler<T> strategyResultHandler) {
+        this.strategyResultHandler = strategyResultHandler;
     }
 
     @Override
-    public void executeStrategy(Strategy<T> strategy, T t) {
+    public void executeStrategy(@NonNull Strategy<T> strategy, @NonNull T t) {
         try {
             strategy.apply(t);
+            strategyResultHandler.onSuccess(strategy, t);
         } catch (Exception e) {
-            handleStrategyException(strategy, t, e);
+            strategyResultHandler.onException(strategy, t, e);
         }
-    }
-
-    @Override
-    public void handleStrategyException(Strategy<T> strategy, T data, Exception e) {
-        strategyExceptionHandler.handleException(strategy, data, e);
     }
 
 }

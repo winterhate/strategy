@@ -5,11 +5,12 @@ import cz.kb.oleg.strategy.decisions.dto.DecisionDto;
 import cz.kb.oleg.strategy.service.dispatcher.DefaultStrategyDispatcher;
 import cz.kb.oleg.strategy.service.dispatcher.ValidatingStrategyDispatcher;
 import cz.kb.oleg.strategy.service.executors.AsyncStrategyExecutor;
-import cz.kb.oleg.strategy.service.executors.DefaultStrategyExceptionHandler;
 import cz.kb.oleg.strategy.service.executors.DefaultStrategyExecutor;
+import cz.kb.oleg.strategy.service.executors.DefaultStrategyResultHandler;
 import cz.kb.oleg.strategy.service.executors.LoggingStrategyExecutor;
 import cz.kb.oleg.strategy.service.selectors.TestableStrategySelector;
 import jakarta.validation.Validator;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,10 +27,10 @@ public class DecisionConfiguration {
     }
 
     @Bean
-    public StrategyExceptionHandler<DecisionDto> decisionStrategyExecutorExceptionHandler() {
-        return new DefaultStrategyExceptionHandler<>() {
+    public StrategyResultHandler<DecisionDto> decisionStrategyExecutorExceptionHandler() {
+        return new DefaultStrategyResultHandler<>() {
             @Override
-            public void handleException(Strategy<DecisionDto> strategy, DecisionDto decisionDto, Exception e) {
+            public void onException(@NonNull Strategy<DecisionDto> strategy, @NonNull DecisionDto decisionDto, @NonNull Exception e) {
                 final var strategyName = getStrategyName(strategy);
                 log.warn("Strategy {} execution failed with error: {}", strategyName, e.getMessage());
             }
@@ -37,8 +38,8 @@ public class DecisionConfiguration {
     }
 
     @Bean
-    public StrategyExecutor<DecisionDto> decisionStrategyExecutor(StrategyExceptionHandler<DecisionDto> decisionStrategyExceptionHandler) {
-        return new AsyncStrategyExecutor<>(new LoggingStrategyExecutor<>(new DefaultStrategyExecutor<>(decisionStrategyExceptionHandler)));
+    public StrategyExecutor<DecisionDto> decisionStrategyExecutor(StrategyResultHandler<DecisionDto> decisionStrategyResultHandler) {
+        return new AsyncStrategyExecutor<>(new LoggingStrategyExecutor<>(new DefaultStrategyExecutor<>(decisionStrategyResultHandler)));
     }
 
     @Bean

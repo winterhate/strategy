@@ -1,9 +1,9 @@
 package cz.kb.oleg.strategy.api;
 
+import lombok.NonNull;
+
 public interface StrategyExecutor<T> {
 
-    void executeStrategy(Strategy<T> strategy, T t);
-
-    void handleStrategyException(Strategy<T> strategy, T data, Exception e);
+    void executeStrategy(@NonNull Strategy<T> strategy, @NonNull T t);
 
 }

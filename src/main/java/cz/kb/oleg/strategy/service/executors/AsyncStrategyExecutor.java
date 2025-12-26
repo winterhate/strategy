@@ -2,10 +2,10 @@ package cz.kb.oleg.strategy.service.executors;
 
 import cz.kb.oleg.strategy.api.Strategy;
 import cz.kb.oleg.strategy.api.StrategyExecutor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 
 import static java.util.concurrent.Executors.newCachedThreadPool;
@@ -17,24 +17,18 @@ public class AsyncStrategyExecutor<T> extends DefaultStrategyExecutor<T> impleme
     private final StrategyExecutor<T> strategyExecutorDelegate;
     private final ExecutorService executor;
 
-    public AsyncStrategyExecutor(StrategyExecutor<T> strategyExecutorDelegate) {
+    public AsyncStrategyExecutor(@NonNull StrategyExecutor<T> strategyExecutorDelegate) {
         this(strategyExecutorDelegate, newCachedThreadPool());
     }
 
-    public AsyncStrategyExecutor(StrategyExecutor<T> strategyExecutorDelegate, ExecutorService executor) {
-        this.strategyExecutorDelegate = Objects.requireNonNull(strategyExecutorDelegate);
-        this.executor = Objects.requireNonNull(executor);
+    public AsyncStrategyExecutor(@NonNull StrategyExecutor<T> strategyExecutorDelegate, @NonNull ExecutorService executor) {
+        this.strategyExecutorDelegate = strategyExecutorDelegate;
+        this.executor = executor;
     }
 
     @Override
-    public void executeStrategy(Strategy<T> strategy, T t) {
-        executor.submit(() -> {
-            try {
-                strategyExecutorDelegate.executeStrategy(strategy, t);
-            } catch (Exception e) {
-                strategyExecutorDelegate.handleStrategyException(strategy, t, e);
-            }
-        });
+    public void executeStrategy(@NonNull Strategy<T> strategy, @NonNull T t) {
+        executor.submit(() -> strategyExecutorDelegate.executeStrategy(strategy, t));
     }
 
     @Override

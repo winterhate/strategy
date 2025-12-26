@@ -6,6 +6,7 @@ import cz.kb.oleg.strategy.api.StrategyExecutor;
 import cz.kb.oleg.strategy.api.StrategySelector;
 import cz.kb.oleg.strategy.service.executors.DefaultStrategyExecutor;
 import cz.kb.oleg.strategy.service.selectors.DefaultStrategySelector;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collection;
@@ -30,7 +31,7 @@ public class DefaultStrategyDispatcher<T, S extends Strategy<T>> implements Stra
     }
 
     @Override
-    public void dispatch(T data) {
+    public void dispatch(@NonNull T data) {
         strategySelector.selectStrategies(data)
                 .forEach(strategy -> strategyExecutor.executeStrategy(strategy, data));
     }

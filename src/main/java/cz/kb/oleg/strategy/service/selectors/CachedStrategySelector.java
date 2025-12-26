@@ -2,6 +2,7 @@ package cz.kb.oleg.strategy.service.selectors;
 
 import cz.kb.oleg.strategy.api.StrategySelector;
 import cz.kb.oleg.strategy.service.strategies.ClassMappedStrategy;
+import lombok.NonNull;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -21,10 +22,7 @@ public class CachedStrategySelector<T, S extends ClassMappedStrategy<T>> impleme
     }
 
     @Override
-    public List<S> selectStrategies(T t) {
-        if (t == null) {
-            return List.of();
-        }
+    public List<S> selectStrategies(@NonNull T t) {
         return strategyMap.getOrDefault(t.getClass(), List.of());
     }
 

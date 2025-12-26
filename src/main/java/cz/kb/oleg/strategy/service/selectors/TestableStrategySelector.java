@@ -2,6 +2,7 @@ package cz.kb.oleg.strategy.service.selectors;
 
 import cz.kb.oleg.strategy.api.StrategySelector;
 import cz.kb.oleg.strategy.service.strategies.TestableStrategy;
+import lombok.NonNull;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -18,10 +19,7 @@ public class TestableStrategySelector<T, S extends TestableStrategy<T>> implemen
     }
 
     @Override
-    public List<S> selectStrategies(T t) {
-        if (t == null) {
-            return List.of();
-        }
+    public List<S> selectStrategies(@NonNull T t) {
         return testableStrategies.stream()
                 .filter(strategy -> strategy.isApplicable(t))
                 .toList();
