@@ -9,6 +9,7 @@ import cz.kb.oleg.strategy.events.dto.EventOneDto;
 import cz.kb.oleg.strategy.events.dto.EventTwoDto;
 import cz.kb.oleg.strategy.service.dispatcher.DefaultStrategyDispatcher;
 import cz.kb.oleg.strategy.service.dispatcher.ValidatingStrategyDispatcher;
+import cz.kb.oleg.strategy.service.executors.AsyncStrategyExecutor;
 import cz.kb.oleg.strategy.service.executors.DefaultStrategyExecutor;
 import cz.kb.oleg.strategy.service.selectors.CachedStrategySelector;
 import jakarta.validation.ConstraintViolationException;
@@ -48,8 +49,8 @@ class StrategyApplicationTests {
 
         @Bean
         public StrategyExecutor<EventDto> eventDtoStrategyExecutor() {
-            return new DefaultStrategyExecutor<>();
-//            return new AsyncStrategyExecutor<>(new DefaultStrategyExecutor<>());
+//            return new DefaultStrategyExecutor<>();
+            return new AsyncStrategyExecutor<>(new DefaultStrategyExecutor<>());
         }
 
         @Bean
