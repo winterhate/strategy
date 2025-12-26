@@ -79,6 +79,7 @@ class StrategyApplicationTests {
 
     @Test
     void testStrategy() {
+        log.info("Test strategy");
         eventDtoStrategyDispatcher.dispatch(new EventOneDto());
         final var data = new EventTwoDto();
         data.setDetailTwo(""); // to test validation
