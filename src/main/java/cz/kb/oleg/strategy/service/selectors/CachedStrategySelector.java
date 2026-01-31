@@ -17,7 +17,7 @@ public class CachedStrategySelector<T, S extends ClassMappedStrategy<T>> impleme
         classMappedStrategies.stream()
                 .map(ClassMappedStrategy::getApplicableClass)
                 .forEach(cls -> strategyMap.put(cls, classMappedStrategies.stream()
-                        .filter(strategy -> strategy.getApplicableClass().equals(cls))
+                        .filter(strategy -> cls.isAssignableFrom(strategy.getApplicableClass()))
                         .toList()));
     }
 

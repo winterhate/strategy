@@ -12,7 +12,7 @@ import static java.util.concurrent.Executors.newCachedThreadPool;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 @Slf4j
-public class AsyncStrategyExecutor<T> extends DefaultStrategyExecutor<T> implements DisposableBean {
+public class AsyncStrategyExecutor<T> implements StrategyExecutor<T>, DisposableBean {
 
     private final StrategyExecutor<T> strategyExecutorDelegate;
     private final ExecutorService executor;

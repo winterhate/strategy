@@ -10,17 +10,17 @@ import java.util.List;
 
 public class DefaultStrategySelector<T, S extends Strategy<T>> implements StrategySelector<T, S> {
 
-    private final List<S> testableStrategies;
+    private final List<S> strategies;
 
-    public DefaultStrategySelector(Collection<S> testableStrategies) {
-        this.testableStrategies = testableStrategies.stream()
+    public DefaultStrategySelector(Collection<S> strategies) {
+        this.strategies = strategies.stream()
                 .sorted(Comparator.comparing(s -> s.getClass().getSimpleName()))
                 .toList();
     }
 
     @Override
     public List<S> selectStrategies(@NonNull T t) {
-        return testableStrategies;
+        return strategies;
     }
 
 }
