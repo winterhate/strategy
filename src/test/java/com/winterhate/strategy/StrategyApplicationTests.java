@@ -7,6 +7,8 @@ import com.winterhate.strategy.events.EventStrategy;
 import com.winterhate.strategy.events.dto.EventDto;
 import com.winterhate.strategy.events.dto.EventOneDto;
 import com.winterhate.strategy.events.dto.EventTwoDto;
+import com.winterhate.strategy.handlers.HandlerDto;
+import com.winterhate.strategy.handlers.Handlers;
 import com.winterhate.strategy.service.dispatcher.DefaultStrategyDispatcher;
 import com.winterhate.strategy.service.dispatcher.ValidatingStrategyDispatcher;
 import com.winterhate.strategy.service.executors.AsyncStrategyExecutor;
@@ -76,6 +78,9 @@ class StrategyApplicationTests {
     @Autowired
     StrategyDispatcher<EventDto> eventDtoStrategyDispatcher;
 
+    @Autowired
+    StrategyDispatcher<HandlerDto> handlerStrategyDispatcher;
+
     @Test
     void testStrategy() {
         log.info("Test strategy");
@@ -84,6 +89,9 @@ class StrategyApplicationTests {
         data.setDetailTwo(""); // to test validation
         final var constraintViolationException = assertThrows(ConstraintViolationException.class, () -> eventDtoStrategyDispatcher.dispatch(data));
         assertEquals("detailTwo: must not be blank", constraintViolationException.getMessage());
+
+        handlerStrategyDispatcher.dispatch(new HandlerDto(Handlers.FIRST, "First handler"));
+        handlerStrategyDispatcher.dispatch(new HandlerDto(Handlers.SECOND, "Second handler"));
     }
 
 }
