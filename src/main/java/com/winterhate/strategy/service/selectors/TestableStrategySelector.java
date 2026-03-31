@@ -1,0 +1,28 @@
+package com.winterhate.strategy.service.selectors;
+
+import com.winterhate.strategy.api.StrategySelector;
+import com.winterhate.strategy.service.strategies.TestableStrategy;
+import lombok.NonNull;
+
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+
+public class TestableStrategySelector<T, S extends TestableStrategy<T>> implements StrategySelector<T, S> {
+
+    private final List<S> testableStrategies;
+
+    public TestableStrategySelector(Collection<S> testableStrategies) {
+        this.testableStrategies = testableStrategies.stream()
+                .sorted(Comparator.comparing(s -> s.getClass().getSimpleName()))
+                .toList();
+    }
+
+    @Override
+    public List<S> selectStrategies(@NonNull T t) {
+        return testableStrategies.stream()
+                .filter(strategy -> strategy.isApplicable(t))
+                .toList();
+    }
+
+}
